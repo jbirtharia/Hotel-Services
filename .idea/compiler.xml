@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="config-server" />
         <module name="service-registry" />
       </profile>
       <profile name="Annotation profile for api-gateway" enabled="true">
@@ -34,6 +35,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
+      <module name="config-server" options="-parameters" />
       <module name="hotel-service" options="-parameters" />
       <module name="rating-service" options="-parameters" />
       <module name="service-registry" options="-parameters" />
