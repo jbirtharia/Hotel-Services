@@ -3,7 +3,7 @@ package com.hotel.controllers;
 import com.hotel.entities.User;
 import com.hotel.fallbackhandler.RatingHotelFallbackHandler;
 import com.hotel.service.UserService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
+    @RateLimiter(name = "userRateLimiter", fallbackMethod = "getRateLimitFallback")
     public ResponseEntity<List<User>> getAllUsers(){
         return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());
     }
@@ -51,5 +52,13 @@ public class UserController {
     /// (as the last parameter) to handle the exception that triggered the fallback.
     public ResponseEntity<User> getRatingHotelsFallback(String userId, Throwable throwable) {
         return ratingHotelFallbackHandler.fallbackForServiceCall(userId, throwable);
+    }
+
+    /// Fallback method for rate limiter. If fallback is called, it will return 429 status code.
+    public ResponseEntity<List<User>> getRateLimitFallback(Throwable throwable) {
+        log.error("API LIMIT HAS BEEN REACHED !!!");
+        log.error("Fallback has been executed because API limit has been reached : " +
+                "{}", throwable.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
     }
 }
